@@ -5,7 +5,7 @@
 #include <vulkan/vulkan.hpp>
 
 namespace Sphynx::Rendering {
-	inline static vk::DispatchLoaderDynamic s_DispatchLoader;
+	inline static vk::detail::DispatchLoaderDynamic s_DispatchLoader;
 
 	class VulkanInstance {
 	public:

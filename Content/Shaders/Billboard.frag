@@ -76,5 +76,11 @@ void main() {
 		case 31: image_color = texture(image31, in_uv); break;
 	}
 
+	// just a hacky solution so that multiple billboards kinda can overlap
+	// proper transparency would need to be implemented differently!
+	if (image_color.a == 0.0) {
+        discard;
+    }
+
 	out_Color = image_color * vec4(in_color, 1.0);
 }

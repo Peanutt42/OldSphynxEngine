@@ -21,7 +21,7 @@ namespace Sphynx::Rendering {
 
 	void VulkanSwapChain::Recreate(vk::RenderPass renderpass) {
 		VulkanContext::Window->SetResizeCallbackEnable(false);
-		
+
 		VulkanContext::LogicalDevice.waitIdle();
 
 		Create();
@@ -45,7 +45,7 @@ namespace Sphynx::Rendering {
 			framebufferInfo.height = m_Extent.height;
 			framebufferInfo.layers = 1;
 
-			vk::Result result = VulkanContext::LogicalDevice.createFramebuffer(&framebufferInfo, nullptr, &m_Framebuffers[i], vk::getDispatchLoaderStatic());
+			vk::Result result = VulkanContext::LogicalDevice.createFramebuffer(&framebufferInfo, nullptr, &m_Framebuffers[i], vk::detail::getDispatchLoaderStatic());
 			SE_ASSERT(result == vk::Result::eSuccess, Logging::Rendering, "Failed to create framebuffer");
 		}
 	}
@@ -130,7 +130,7 @@ namespace Sphynx::Rendering {
 
 		vk::Result result = VulkanContext::LogicalDevice.createSwapchainKHR(&createInfo, nullptr, &m_SwapChain);
 		SE_ASSERT(result == vk::Result::eSuccess, Logging::Rendering, "Failed to create swapchain");
-		
+
 		if (oldSwapchain) {
 			for (auto oldImageView : m_ImageViews)
 				VulkanContext::LogicalDevice.destroyImageView(oldImageView, nullptr);

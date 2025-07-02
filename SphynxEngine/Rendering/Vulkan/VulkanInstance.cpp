@@ -8,7 +8,7 @@
 namespace Sphynx::Rendering {
 	VulkanInstance::VulkanInstance(bool validation)
 		: Validation(validation)
-	{		
+	{
 		vk::ApplicationInfo appInfo{};
 		appInfo.pApplicationName = "Sphynx Engine";
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -40,7 +40,7 @@ namespace Sphynx::Rendering {
 
 		vk::Result result = vk::createInstance(&createInfo, nullptr, &Instance);
 		SE_ASSERT(result == vk::Result::eSuccess, Logging::Rendering, "Failed to create vulkan instance");
-		
+
 		s_DispatchLoader.init(Instance, vkGetInstanceProcAddr);
 
 
@@ -112,7 +112,7 @@ namespace Sphynx::Rendering {
 		}
 		if (unsupportedValidationLayerCount != 0)
 			return false;
-		
+
 		if (Validation) {
 			createInfo.enabledLayerCount = (uint32)ValidationLayers.size();
 			createInfo.ppEnabledLayerNames = ValidationLayers.data();
@@ -120,14 +120,20 @@ namespace Sphynx::Rendering {
 		return Validation;
 	}
 
-	VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT /*messageType*/, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* /*pUserData*/) {
-		if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-			SE_WARN(Logging::Rendering, "[Validation Layer]: {}", pCallbackData->pMessage);
+	VKAPI_ATTR uint VKAPI_CALL
+	debugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+			vk::DebugUtilsMessageTypeFlagsEXT /*messageType*/,
+			const vk::DebugUtilsMessengerCallbackDataEXT *pCallbackData,
+			void * /*pUserData*/)
+	{
+		if (messageSeverity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning) {
+			SE_WARN(Logging::Rendering, "[Validation Layer]: {}",
+			pCallbackData->pMessage);
+		} else {
+			SE_ERR(Logging::Rendering, "[Validation Layer]: {}",
+			pCallbackData->pMessage);
 		}
-		else {
-			SE_ERR(Logging::Rendering, "[Validation Layer]: {}", pCallbackData->pMessage);
-		}
-		
+
 		return VK_FALSE;
 	}
 	void VulkanInstance::_ConfigureDebugMessengerCreateInfo(vk::DebugUtilsMessengerCreateInfoEXT& createInfo) {
@@ -137,7 +143,7 @@ namespace Sphynx::Rendering {
 								 vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation;
 		createInfo.pfnUserCallback = debugCallback;
 	}
-	
+
 	void VulkanInstance::_CreateDebugMessenger(const vk::DebugUtilsMessengerCreateInfoEXT& createInfo) {
 		vk::Result result = Instance.createDebugUtilsMessengerEXT(&createInfo, nullptr, &m_DebugMessenger, s_DispatchLoader);
 		SE_ASSERT(result == vk::Result::eSuccess, Logging::Rendering, "Failed to create debug messenger");
